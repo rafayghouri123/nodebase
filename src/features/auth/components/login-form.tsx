@@ -75,13 +75,17 @@ const LoginForm = () => {
                                         className='w-full'
                                         type='button'
                                         disabled={isPending}
-                                    >Continue with Github</Button>
+                                    >
+                                        <Image src='/logos/github.svg' width={20} height={20} alt='github'/>
+                                        Continue with Github</Button>
                                     <Button
                                         variant={'outline'}
                                         className='w-full'
                                         type='button'
                                         disabled={isPending}
-                                    >Continue with Google</Button>
+                                    >
+                                        <Image src='/logos/google.svg' width={20} height={20} alt='google'/>
+                                        Continue with Google</Button>
                                 </div>
                                 <div className='grid gap-6'>
                                     <FormField

@@ -79,16 +79,21 @@ const RegisterForm = () => {
                                 <div className='flex flex-col gap-4'>
                                     <Button 
                                     variant={'outline'}
-                                    className='w-full'
+                                    className='w-full gap-2"'
                                     type='button'
                                     disabled={isPending}
-                                    >Continue with Github</Button>
+                                    >
+                                        <Image src='/logos/github.svg' width={20} height={20} alt='github'/>
+                                        Continue with Github</Button>
                                     <Button 
                                     variant={'outline'}
                                     className='w-full'
                                     type='button'
                                     disabled={isPending}
-                                    >Continue with Google</Button>
+                                    >
+                                    <Image src='/filddsadasdsae.svg' width={20} height={20} alt='google'/>
+                                        Continue with Google
+                                </Button>
                                 </div>
                                 <div className='grid gap-6'>
                                         <FormField
