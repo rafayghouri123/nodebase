@@ -1,23 +1,21 @@
-
-import prisma from "@/lib/database";
-import { getQueryClient, trpc } from "@/trpc/server";
+// NO "use client" here
+import { requireAuth } from "@/lib/auth-utils";
 import { caller } from "@/trpc/server";
-import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
-import Client from "./Client";
+import Logout from "./logout";
 
-export default async function  Page() {
+export default async function Page() {
+  await requireAuth()
 
-  const queryClient =getQueryClient()
-
-  void queryClient.prefetchQuery(trpc.getUsers.queryOptions())
+  const data = await caller.getUsers()
 
   return (
-    <div>
-      <h1 className="text-red-500">Welcome home</h1>
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <Client/>
-      </HydrationBoundary>
-      
-    </div>
+    <>
+      <div>
+        Protected route
+        {JSON.stringify(data)}
+      </div>
+
+      <Logout />
+    </>
   );
 }
