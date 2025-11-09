@@ -17,6 +17,12 @@ export default  function Page() {
     }
   }))
 
+  const testAi = useMutation(trpc.testAi.mutationOptions({
+    onSuccess:()=>{
+      toast.success("Ai-Job queued")
+    }
+  }))
+
   return (
     <>
       <div>
@@ -24,6 +30,7 @@ export default  function Page() {
         {JSON.stringify(data,null,2)}
       </div>
       <Button onClick={()=>create.mutate()} disabled={create.isPending}>create worklfow</Button>
+      <Button onClick={()=>testAi.mutate()} disabled={create.isPending}>testAi</Button>
       <Logout />
     </>
   );
