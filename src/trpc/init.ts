@@ -43,7 +43,7 @@ export const protectedProcedure  = baseProcedure.use(async({ctx,next})=>{
 })
 
 
-export const premiumSubcription = protectedProcedure.use(
+export const premiumProcedure = protectedProcedure.use(
   async ({ctx,next})=>{
     const customer= await polarClient.customers.getStateExternal({
       externalId:ctx.auth.user.id
