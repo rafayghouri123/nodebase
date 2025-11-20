@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -15,13 +12,14 @@ datasource db {
 }
 
 model User {
-  id            String    @id
+  id            String       @id
   name          String
   email         String
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean      @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now()) @updatedAt
+
   sessions      Session[]
   accounts      Account[]
   workflows     Workflow[]
@@ -75,13 +73,59 @@ model Verification {
   @@map("verification")
 }
 
-model Workflow{
-  id String @id @default(cuid())
-  name String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Workflow {
+  id          String        @id @default(cuid())
+  name        String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  nodes       Node[]
+  connections Connection[]
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
-  userId String
-  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+enum NodeType {
+  INITIAL
+}
 
-} 
+model Node {
+  id        String        @id @default(cuid())
+  workflowId String
+  workflow Workflow       @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  name      String
+    type         NodeType      @default(INITIAL)
+
+  // OUTGOING connections
+  outputConnections Connection[] @relation("FromNode")
+
+  // INCOMING connections
+  inputConnections Connection[] @relation("ToNode")
+
+  position Json
+  data     Json            @default("{}")
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model Connection {
+  id           String   @id @default(cuid())
+  workflowId   String
+  workflow     Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  // FROM node (source)
+  fromNodeId   String
+  fromNode     Node     @relation("FromNode", fields: [fromNodeId], references: [id], onDelete: Cascade)
+
+  // TO node (destination)
+  toNodeId     String
+  toNode       Node     @relation("ToNode", fields: [toNodeId], references: [id], onDelete: Cascade)
+
+  fromOutput   String   @default("main")
+  toInput      String   @default("main")
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([fromNodeId, toNodeId, fromOutput, toInput])
+}
