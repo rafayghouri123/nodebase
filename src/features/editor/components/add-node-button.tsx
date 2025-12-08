@@ -11,7 +11,7 @@ export const AddNodeButton=memo(()=>{
 
     return(
         <NodeSelector open={selectorOpen} onOpenChange={setSelectorOpen}>
-        <Button className="bg-background" variant="outline" size="icon" onClick={()=>{}}>
+        <Button className="bg-background" variant="outline" size="icon">
             <PlusIcon/>
         </Button>
         </NodeSelector>
