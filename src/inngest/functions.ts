@@ -1,36 +1,52 @@
-import prisma from "@/lib/database";
+import test from "node:test";
 import { inngest } from "./client";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { generateText } from 'ai';
-import { createAnthropic } from '@ai-sdk/anthropic';
-import { createOpenAI } from '@ai-sdk/openai';
+import { NonRetriableError } from "inngest";
+import prisma from "@/lib/database";
+import { topoLogicalSort } from "./utils";
+import { NodeType } from "@/generated/prisma/enums";
+import { getExecutor } from "@/features/executions/lib/executor-registry";
 
-const google = createGoogleGenerativeAI()
 
-const openai = createOpenAI()
 
-const anthropic =createAnthropic() 
 
-export const execute = inngest.createFunction(
-  { id: "execute-ai" },
-  { event: "execute/ai" },
-  async ({ event, step }) => {
-    await step.sleep("pretend","5s")
-    const {steps: geminiSteps} = await  step.ai.wrap("gemini-generate-text",generateText,{
-        model:google("gemini-2.5-flash"),
-        system:"You are a helpful assistance",
-        prompt:"What is the 2+2?",
+export const executeWorkflow = inngest.createFunction(
+  { id: "execute-workflow" },
+  { event: "workflows/execute.workflow" },
+ async({event,step})=>{
+
+  const workflowId =event.data.workflowId
+
+  if(!workflowId){
+    throw new NonRetriableError("Workflow ID is missing")
+  }
+
+    const sortedNodes=  await step.run("prepare-workflow",async()=>{
+      const workflow = await prisma.workflow.findUniqueOrThrow({
+        where:{
+          id:workflowId
+        },
+        include:{
+          nodes:true,
+          connections:true
+        }
+      })
+
+      return topoLogicalSort( workflow.nodes,workflow.connections)    
     })
-    const {steps: openaiSteps} = await  step.ai.wrap("openai-generate-text",generateText,{
-        model:openai("gpt-4"),
-        system:"You are a helpful assistance",
-        prompt:"What is the 2+2?",
-    })
-    const {steps: anthropicSteps} = await  step.ai.wrap("anthropic-generate-text",generateText,{
-        model:anthropic("claude-3-7-sonnet-20250219"),
-        system:"You are a helpful assistance",
-        prompt:"What is the 2+2?",
-    })
-    return {geminiSteps,openaiSteps,anthropicSteps}
-  },
+
+    let context = event.data.initialData||{}
+    
+    for(const node of sortedNodes){
+      const executor = getExecutor(node.type as NodeType)
+      context = await executor({
+        data:node.data as Record<string,unknown>,
+        nodeId:node.id,
+        context,
+        step
+      })
+    }
+
+
+    return {workflowId,result:context}
+ }
 );
