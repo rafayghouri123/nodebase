@@ -7,6 +7,8 @@ import { memo, useState } from "react"
 import { GlobeIcon } from "lucide-react"
 import { HttpRequestDialog, HttpRequestValues } from "../dialog"
 import { defaultConfig } from "next/dist/server/config-shared"
+import { UseNodeStatus } from "../../hooks/use-node-status"
+import { fetchHttpRequestRealtimeToken } from "../actions"
 
 
 type HttpRequestNodeData = {
@@ -24,7 +26,12 @@ export const HttpRequestNode=memo((props:NodeProps<HttpRequestNodeType>)=>{
     const nodeData = props.data 
     const description = nodeData?.endpoint ? `${nodeData.method||"GET"}:${nodeData.endpoint}`:"Not configured"
 
-    const nodeStatus = "success"
+    const nodeStatus = UseNodeStatus({
+        nodeId:props.id,
+        channel:"http-request-execution",
+        topic:"status",
+        refreshToken:fetchHttpRequestRealtimeToken
+    })
 
         const [dialogOpen,setDialogOpen] = useState(false)
 
