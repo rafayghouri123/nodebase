@@ -4,3 +4,6 @@ procs:
 
   next:
     cmd: ["npm.cmd", "run", "dev"]
+
+  ngrok:
+    cmd: ["npm.cmd", "run", "ngrok:dev"]

@@ -4,12 +4,14 @@ import { NodeExector } from "../types";
 import { manualTriggerExecutor } from "@/features/triggers/components/manual-trigger/executor";
 import { HttpRequestNode } from "../components/http-request/node";
 import { httpRequestExecutor } from "../components/http-request/executor";
+import { GoogleFormExecutorTriggerExecutor } from "@/features/triggers/components/google-form-trigger/executor";
 
 
 export const executeRegistry :Record<NodeType,NodeExector> ={
     [NodeType.MANUAL_TRIGGER]: manualTriggerExecutor,
     [NodeType.INITIAL]:manualTriggerExecutor,
-    [NodeType.HTTP_REQUEST]:httpRequestExecutor
+    [NodeType.HTTP_REQUEST]:httpRequestExecutor,
+    [NodeType.GOOGLE_FORM_TRIGGER]:GoogleFormExecutorTriggerExecutor
     
 
 }
