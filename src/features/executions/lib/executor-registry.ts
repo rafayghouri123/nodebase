@@ -5,13 +5,15 @@ import { manualTriggerExecutor } from "@/features/triggers/components/manual-tri
 import { HttpRequestNode } from "../components/http-request/node";
 import { httpRequestExecutor } from "../components/http-request/executor";
 import { GoogleFormExecutorTriggerExecutor } from "@/features/triggers/components/google-form-trigger/executor";
+import { StripeExecutorTriggerExecutor } from "@/features/triggers/components/strip-trigger/executor";
 
 
 export const executeRegistry :Record<NodeType,NodeExector> ={
     [NodeType.MANUAL_TRIGGER]: manualTriggerExecutor,
     [NodeType.INITIAL]:manualTriggerExecutor,
     [NodeType.HTTP_REQUEST]:httpRequestExecutor,
-    [NodeType.GOOGLE_FORM_TRIGGER]:GoogleFormExecutorTriggerExecutor
+    [NodeType.GOOGLE_FORM_TRIGGER]:GoogleFormExecutorTriggerExecutor,
+    [NodeType.STRIPE_TRIGGER]:StripeExecutorTriggerExecutor
     
 
 }
