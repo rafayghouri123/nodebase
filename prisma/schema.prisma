@@ -23,6 +23,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   workflows     Workflow[]
+  credentials Credentials[]
 
   @@unique([email])
   @@map("user")
@@ -73,6 +74,25 @@ model Verification {
   @@map("verification")
 }
 
+model Credentials{
+  id          String        @id @default(cuid())
+  name        String
+  value       String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  userId      String
+  type        CredentialsType
+  user  User @relation(fields: [userId],references: [id],onDelete: Cascade)
+  Node Node[]
+}
+
+enum CredentialsType {
+  OPENAI
+  ANTHROPIC
+  GEMINI
+
+}
+
 model Workflow {
   id          String        @id @default(cuid())
   name        String
@@ -113,6 +133,9 @@ model Node {
   data     Json            @default("{}")
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
+
+  credentialId String?
+  credential Credentials? @relation(fields: [credentialId],references: [id])
 }
 
 model Connection {

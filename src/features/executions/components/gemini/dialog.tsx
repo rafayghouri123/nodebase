@@ -1,17 +1,22 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { Dialog,DialogContent,DialogDescription,DialogFooter,DialogHeader,DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectTrigger,SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
+
+import { CredentialsType } from "@/generated/prisma/browser";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
-export const AVALIABLE_MODELS=[
+export const AVALIABLE_MODELS = [
+    "gemini-2.0-flash",
     "gemini-1.5-flash",
     "gemini-1.5-flash-8b",
     "gemini-1.5-pro",
@@ -22,20 +27,21 @@ export const AVALIABLE_MODELS=[
 
 
 const formSchema = z.object({
-    variableName:z.string().min(1,{message:"Variable name is required"}).regex(/^[A-za-z_$][A-Za-z0-9_$]*$/,{
-        message:"Variable name must start with a letter or underscore and only contain letters,numbers, and underscores"
+    variableName: z.string().min(1, { message: "Variable name is required" }).regex(/^[A-za-z_$][A-Za-z0-9_$]*$/, {
+        message: "Variable name must start with a letter or underscore and only contain letters,numbers, and underscores"
     }),
-    model:z.enum(AVALIABLE_MODELS),
-    systemPrompt:z.string().optional(),
-    userPrompt:z.string().min(1,"User prompt is required")
+    model: z.enum(AVALIABLE_MODELS),
+    credentialId: z.string().min(1, "Credential is required"),
+    systemPrompt: z.string().optional(),
+    userPrompt: z.string().min(1, "User prompt is required")
 
 })
 
-interface Props{
-    open:boolean;
-    onOpenChange:(open:boolean)=>void;
-    onSubmit:(values:z.infer<typeof formSchema>)=>void;
-    defaultValues?:Partial<GeminiValues>
+interface Props {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    onSubmit: (values: z.infer<typeof formSchema>) => void;
+    defaultValues?: Partial<GeminiValues>
 
 }
 
@@ -45,44 +51,47 @@ export const GeminiDialog = ({
     open,
     onOpenChange,
     onSubmit,
-    defaultValues={}
+    defaultValues = {}
 
-   
 
-}:Props)=>{
 
-    
+}: Props) => {
+
+    const { data: credentials, isLoading: isLoadingCredentials } = useCredentialsByType(CredentialsType.GEMINI)
+
     const form = useForm<z.infer<typeof formSchema>>({
-        resolver:zodResolver(formSchema),
-        defaultValues:{
-            variableName:defaultValues.variableName||"",
-            model: defaultValues.model||AVALIABLE_MODELS[0],
-            systemPrompt:defaultValues.systemPrompt||"",
-            userPrompt:defaultValues.userPrompt||""
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            variableName: defaultValues.variableName || "",
+            credentialId: defaultValues.credentialId || "",
+            model: defaultValues.model || AVALIABLE_MODELS[0],
+            systemPrompt: defaultValues.systemPrompt || "",
+            userPrompt: defaultValues.userPrompt || ""
         }
     })
     //const watchMethod = form.watch("method")
     //const showBodyField = ["POST","PUT","PATCH"].includes(watchMethod)
-    
-    const handleSubmit = (value:z.infer<typeof formSchema>)=>{
+
+    const handleSubmit = (value: z.infer<typeof formSchema>) => {
         onSubmit(value)
         onOpenChange(false)
     }
 
-    useEffect(()=>{
-        if(open){
+    useEffect(() => {
+        if (open) {
             form.reset({
-                variableName:defaultValues.variableName|| "",
-                model: defaultValues.model||AVALIABLE_MODELS[0],
-                systemPrompt:defaultValues.systemPrompt||"",
-                userPrompt:defaultValues.userPrompt||""
+                variableName: defaultValues.variableName || "",
+                credentialId: defaultValues.credentialId || "",
+                model: defaultValues.model || AVALIABLE_MODELS[0],
+                systemPrompt: defaultValues.systemPrompt || "",
+                userPrompt: defaultValues.userPrompt || ""
             })
         }
-    },[open,defaultValues,form])
+    }, [open, defaultValues, form])
 
     const watchVariableName = form.watch("variableName") || "MyGemini"
 
-    return(
+    return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
                 <DialogHeader>
@@ -93,45 +102,69 @@ export const GeminiDialog = ({
                     <form onSubmit={form.handleSubmit(handleSubmit)}
                         className="space-y-8 mt-4"
                     >
-                          <FormField control={form.control} name="variableName" render={({field})=>(
+                        <FormField control={form.control} name="variableName" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Variable Name</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="MyGemini" {...field}/>
+                                    <Input placeholder="MyGemini" {...field} />
                                 </FormControl>
                                 <FormDescription>Use this name to reference the result in other nodes:{" "} {`{{${watchVariableName}.text}}`} </FormDescription>
-                                <FormMessage/>
+                                <FormMessage />
                             </FormItem>
                         )} />
 
-                         <FormField control={form.control} name="model" render={({field})=>(
+                        <FormField control={form.control} name="credentialId" render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Gemini Credential</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoadingCredentials||!credentials?.length}>
+                                    <FormControl>
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Select a credential"/>
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {credentials!.map((credential) => (
+                                            <SelectItem key={credential.id} value={credential.id}>
+                                                <div className="flex items-center gap-2">
+                                                    <Image src="/logos/gemini.svg" alt="Gemini" width={16} height={16} />
+                                                    {credential.name}
+                                                </div>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+
+                        <FormField control={form.control} name="model" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Model</FormLabel>
                                 <Select defaultValue={field.value} onValueChange={field.onChange}>
                                     <FormControl>
                                         <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select a model"/>
+                                            <SelectValue placeholder="Select a model" />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {AVALIABLE_MODELS.map((model)=>(
+                                        {AVALIABLE_MODELS.map((model) => (
                                             <SelectItem key={model} value={model}>{model}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
                                 <FormDescription>The Google Gemini model to use for completion</FormDescription>
-                                <FormMessage/>
+                                <FormMessage />
                             </FormItem>
                         )} />
-                        
-                        
 
-                   
-                            <FormField control={form.control} name="systemPrompt" render={({field})=>(
+
+
+
+                        <FormField control={form.control} name="systemPrompt" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>System Prompt (Optional)</FormLabel>
                                 <FormControl>
-                                    <Textarea placeholder="You are a helpfull assistance" {...field} className="min-h-[80px] font-mono text-sm "/>
+                                    <Textarea placeholder="You are a helpfull assistance" {...field} className="min-h-[80px] font-mono text-sm " />
                                 </FormControl>
                                 <FormDescription>
                                     Sets behaviour of assitant. Use{"{{variables}}"} for simple values or {"{{json variable}}"}
@@ -139,18 +172,18 @@ export const GeminiDialog = ({
                             </FormItem>
                         )} />
 
-                        <FormField control={form.control} name="userPrompt" render={({field})=>(
+                        <FormField control={form.control} name="userPrompt" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>User Prompt</FormLabel>
                                 <FormControl>
-                                    <Textarea placeholder="Summarize this text:{{json httpResponse.data}}" {...field} className="min-h-[120px] font-mono text-sm "/>
+                                    <Textarea placeholder="Summarize this text:{{json httpResponse.data}}" {...field} className="min-h-[120px] font-mono text-sm " />
                                 </FormControl>
                                 <FormDescription>
                                     The prompt to send to the AI. Use{"{{variables}}"} for simple values or {"{{json variable}}"} to stringify the object
                                 </FormDescription>
                             </FormItem>
                         )} />
-                        
+
                         <DialogFooter className="mt-4">
                             <Button type="submit">Save</Button>
                         </DialogFooter>
