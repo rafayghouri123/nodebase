@@ -5,6 +5,7 @@ import Handlebars from "handlebars"
 import { geminiChannel } from "@/inngest/channel/gemini";
 import {generateText} from "ai"
 import prisma from "@/lib/database";
+import { CarTaxiFront } from "lucide-react";
 
 
 
@@ -24,7 +25,7 @@ type GeminiData = {
     userPrompt?:string
 }
 
-export const geminiExecutor: NodeExector<GeminiData> = async ({ data, nodeId, context, step, publish }) => {
+export const geminiExecutor: NodeExector<GeminiData> = async ({ data, nodeId,userId, context, step, publish }) => {
 
 
     await publish(
@@ -76,13 +77,20 @@ export const geminiExecutor: NodeExector<GeminiData> = async ({ data, nodeId, co
  const credential=await step.run("get-credential",()=>{
     return prisma.credentials.findUnique({
     where: {
-        id: data.credentialId
+        id: data.credentialId,
+        userId
       
     }
 })
  })  
 
  if(!credential){
+     await publish(
+            geminiChannel().status({
+                nodeId,
+                status:"error"
+            })
+        )
     throw new NonRetriableError("Gemini node: Credential not found")
  }
 

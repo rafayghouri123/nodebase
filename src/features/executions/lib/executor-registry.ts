@@ -10,6 +10,8 @@ import { geminiExecutor } from "../components/gemini/executor";
 import { OpenAiNode } from "../components/open-ai/node";
 import { OpenAiExecutor } from "../components/open-ai/executor";
 import { AnthropicExecutor } from "../components/anthropic/executor";
+import { DiscordExecutor } from "../components/discord/executor";
+import { SlackExecutor } from "../components/slack/executor";
 
 
 export const executeRegistry :Record<NodeType,NodeExector> ={
@@ -20,7 +22,9 @@ export const executeRegistry :Record<NodeType,NodeExector> ={
     [NodeType.STRIPE_TRIGGER]:StripeExecutorTriggerExecutor,
     [NodeType.GEMINNI]:geminiExecutor,
     [NodeType.OPENAI]:OpenAiExecutor,
-    [NodeType.ANTHROPIC]:AnthropicExecutor
+    [NodeType.ANTHROPIC]:AnthropicExecutor,
+    [NodeType.DISCORD]:DiscordExecutor,
+    [NodeType.SLACK]:SlackExecutor
     
 
 }

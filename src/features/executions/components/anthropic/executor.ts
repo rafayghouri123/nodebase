@@ -23,7 +23,7 @@ type AnthropicData = {
     userPrompt?:string
 }
 
-export const AnthropicExecutor: NodeExector<AnthropicData> = async ({ data, nodeId, context, step, publish }) => {
+export const AnthropicExecutor: NodeExector<AnthropicData> = async ({ data, nodeId, userId,context, step, publish }) => {
 
 
     await publish(
@@ -65,7 +65,7 @@ export const AnthropicExecutor: NodeExector<AnthropicData> = async ({ data, node
             })
         )
 
-        throw new NonRetriableError("Open AI node:User prompt is missing")
+        throw new NonRetriableError("Anthropic node:User prompt is missing")
     }
 
     //throw error CHeck credentials
@@ -81,13 +81,20 @@ export const AnthropicExecutor: NodeExector<AnthropicData> = async ({ data, node
     const credential=await step.run("get-credential",()=>{
         return prisma.credentials.findUnique({
         where: {
-            id: data.credentialId
+            id: data.credentialId,
+            userId
           
         }
     })
      })  
 
       if(!credential){
+         await publish(
+            anthropicChannel().status({
+                nodeId,
+                status:"error"
+            })
+        )
          throw new NonRetriableError("Anthrpic node: Credential not found")
       }
 
