@@ -37,6 +37,35 @@ const LoginForm = () => {
         }
     })
 
+    const signInGithub = async () => {
+        return await authClient.signIn.social({
+        provider: "github",
+        
+    },{
+        onSuccess:()=>{
+            router.push("/")
+        },
+        onError:()=>{
+            toast.error("Something went wrong")
+        }
+    })
+}
+
+
+const signInGoogle = async () => {
+        return await authClient.signIn.social({
+        provider: "google",
+        
+    },{
+        onSuccess:()=>{
+            router.push("/")
+        },
+        onError:()=>{
+            toast.error("Something went wrong")
+        }
+    })
+}
+
     const onSubmit = async (values: LoginFormValue) => {
         await authClient.signIn.email({
             email: values.email,
@@ -71,6 +100,7 @@ const LoginForm = () => {
                             <div className='grid gap-6'>
                                 <div className='flex flex-col gap-4'>
                                     <Button
+                                        onClick={signInGithub}
                                         variant={'outline'}
                                         className='w-full'
                                         type='button'
@@ -79,6 +109,7 @@ const LoginForm = () => {
                                         <Image src='/logos/github.svg' width={20} height={20} alt='github'/>
                                         Continue with Github</Button>
                                     <Button
+                                        onClick={signInGoogle}
                                         variant={'outline'}
                                         className='w-full'
                                         type='button'
