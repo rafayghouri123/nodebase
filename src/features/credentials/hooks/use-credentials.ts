@@ -3,7 +3,7 @@ import { useTRPC } from "@/trpc/client"
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useCredentialsParams } from "./use-credentials-params";
-import { CredentialsType } from "@/generated/prisma/client";
+import { CredentialsType } from "@prisma/client";
 
 
 export const useSuspenseCredentials = () => {
