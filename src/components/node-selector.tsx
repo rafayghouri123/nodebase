@@ -5,7 +5,7 @@ import { GlobeIcon,MousePointerIcon } from "lucide-react"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet"
 import { toast } from "sonner"
 import { Separator } from "./ui/separator"
-import { NodeType } from "@/generated/prisma/enums"
+import { NodeType } from "@prisma/client"
 import { useCallback } from "react"
 import {createId} from "@paralleldrive/cuid2"
 

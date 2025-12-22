@@ -4,7 +4,7 @@ import { EmptyView, EntityContainer, EntityHeader, EntityItem, EntityList, Entit
 import { useRouter } from "next/navigation"
 import {useCredentialsParams  } from "../hooks/use-credentials-params"
 import { useEntitySearch } from "@/hooks/use-entity-search"
-import  { Credentials,CredentialsType} from "@/generated/prisma/browser"
+import  { Credentials,CredentialsType} from "@prisma/client"
 import { useRemoveCredentials, useSuspenseCredentials } from "../hooks/use-credentials"
 import Image from "next/image"
 

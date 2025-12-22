@@ -3,7 +3,7 @@ import { formatDistanceToNow } from "date-fns"
 import { EmptyView, EntityContainer, EntityHeader, EntityItem, EntityList, EntityPagination, EntitySearch, ErrorView, LoadingView } from "@/components/entity-component"
 import { useExecutionsParams } from "./hooks/use-executions-params"
 import { useSuspenseExecutions } from "./hooks/use-executions"
-import { Execution, ExecutionStatus } from "@/generated/prisma/browser"
+import { Execution, ExecutionStatus } from "@prisma/client"
 import { CheckCircle2Icon, ClockIcon, Loader2Icon, XCircleIcon } from "lucide-react"
 
 

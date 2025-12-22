@@ -1,5 +1,5 @@
 import { pagination } from "@/config/constant";
-import { NodeType } from "@/generated/prisma/enums";
+import { NodeType } from "@prisma/client"
 import { inngest } from "@/inngest/client";
 import prisma from "@/lib/database";
 import { createTRPCRouter, premiumProcedure, protectedProcedure } from "@/trpc/init";

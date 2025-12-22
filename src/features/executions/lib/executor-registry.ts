@@ -1,4 +1,4 @@
-import { NodeType } from "@/generated/prisma/enums";
+import { NodeType } from "@prisma/client";
 import { unknown } from "zod";
 import { NodeExector } from "../types";
 import { manualTriggerExecutor } from "@/features/triggers/components/manual-trigger/executor";

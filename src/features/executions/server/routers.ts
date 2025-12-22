@@ -1,5 +1,5 @@
 import { pagination } from "@/config/constant";
-import { CredentialsType } from "@/generated/prisma/enums";
+import { CredentialsType } from "@prisma/client"
 import prisma from "@/lib/database";
 import { createTRPCRouter, premiumProcedure, protectedProcedure } from "@/trpc/init";
 

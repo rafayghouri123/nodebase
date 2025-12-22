@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCredentialsByType } from "@/features/credentials/hooks/use-credentials";
-import { CredentialsType } from "@/generated/prisma/enums";
+import { CredentialsType } from "@prisma/client"
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useEffect } from "react";

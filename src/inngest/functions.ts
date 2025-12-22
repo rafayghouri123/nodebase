@@ -2,7 +2,7 @@ import { inngest } from "./client";
 import { NonRetriableError } from "inngest";
 import prisma from "@/lib/database";
 import { topoLogicalSort } from "./utils";
-import { ExecutionStatus, NodeType } from "@/generated/prisma/enums";
+import { ExecutionStatus, NodeType }from "@prisma/client" ;
 import { getExecutor } from "@/features/executions/lib/executor-registry";
 import { httpRequestChannel } from "./channel/http-request";
 import { manualTriggerChannel } from "./channel/manual-trigger";

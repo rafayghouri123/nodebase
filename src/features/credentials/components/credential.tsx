@@ -1,6 +1,6 @@
 "use client"
 
-import { CredentialsType } from "@/generated/prisma/enums"
+import { CredentialsType } from "@prisma/client"
 import { useParams, useRouter } from "next/navigation"
 import { useCreateCredentials, useSuspenseCredential, useUpdateCredentials } from "../hooks/use-credentials"
 import { useUpgradeModal } from "@/hooks/use-upgrade-modal"

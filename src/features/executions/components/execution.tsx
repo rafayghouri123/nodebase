@@ -1,6 +1,6 @@
 "use client"
 
-import { ExecutionStatus } from "@/generated/prisma/enums"
+import { ExecutionStatus } from "@prisma/client"
 import { CheckCircle2Icon, ClockIcon, Ghost, Loader2Icon, XCircleIcon } from "lucide-react"
 import { useState } from "react"
 import { useSuspenseExecution } from "../hooks/use-executions"
